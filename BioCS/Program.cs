@@ -18,21 +18,21 @@ namespace BioCS
         //Podobienstwo
         public static int CompareS(char w, char u)
         {
-            if (w == u) return 5;
-            else return -5;
+            if (w == u) return 2;
+            else return -1;
         }
 
         //Funkcja Kary
         public static int Penalty(int x)
         {
-            return -(2 + x);
-            //return -2;
+            //return -(2 + x);
+            return -2;
         }
 
         static void Main(string[] args)
         {
             
-        //Czytanie pliku, zapisanie słow to char[]
+        //Czytanie pliku, zapisanie słow do char[]
         String[] input = System.IO.File.ReadAllLines(@"input.txt");
 
             char[] Word1 = input[0].ToCharArray();
@@ -40,8 +40,6 @@ namespace BioCS
 
             int Word1Length = Word1.Length;
             int Word2Length = Word2.Length;
-
-            int penalty;
 
             int[,] D;
             int[,] A;
@@ -92,7 +90,6 @@ namespace BioCS
             B = new int[Word1Length + 1, Word2Length + 1];
             C = new int[Word1Length + 1, Word2Length + 1];
             S = new int[Word1Length + 1, Word2Length + 1];
-            penalty = -2;
 
             for(int i = 0; i <= Word1Length; i++)
             {
@@ -226,33 +223,32 @@ namespace BioCS
             iIndicator = Word1Length;
             jIndicator = Word2Length;
             SLength = 0;
+            int max = S[Word1Length,Word2Length];
 
             while (iIndicator > 0 && jIndicator > 0)
             {
+                
                 int val = S[iIndicator, jIndicator];
-                if (S[iIndicator - 1, jIndicator - 1] > val)
+                //if (val > max)
+                //{
+                //    SList = new List<char>();
+                //    SLength = 0;
+                //}
+                if (S[iIndicator, jIndicator - 1] > val || S[iIndicator - 1, jIndicator] > val)
                 {
-                    SList.Add('\\');
-                    SLength++;
-                    iIndicator--;
-                    jIndicator--;
-                }
-                else
-                {
-                    if (S[iIndicator - 1, jIndicator] > val)
+                    if (S[iIndicator, jIndicator - 1] > S[iIndicator - 1, jIndicator])
+                    {
+                        SList.Add('|');
+                        SLength++;
+                        jIndicator--;
+                    }
+                    else
                     {
                         SList.Add('-');
                         SLength++;
                         iIndicator--;
                     }
-                    else
-                    {
-                        if (S[iIndicator, jIndicator - 1] > val)
-                        {
-                            SList.Add('|');
-                            SLength++;
-                            jIndicator--;
-                        }
+                }
                         else
                         {
                             SList.Add('\\');
@@ -260,8 +256,8 @@ namespace BioCS
                             iIndicator--;
                             jIndicator--;
                         }
-                    }
-                }
+                    
+                
             }
 
             //Stworzenie wektora przejść S i słów Word1i2S
@@ -299,82 +295,84 @@ namespace BioCS
             }
 
 
+
             //Wypisanie na konsolę
+
             //Słowa 1
+            System.Console.WriteLine("Sekwencje wejściowe:");
             foreach (char c in Word1)
-            {
-                System.Console.Write(c);
-            }
-            System.Console.WriteLine(" "+Word1Length.ToString());
+                System.Console.Write(c + " ");
+            //System.Console.WriteLine(" "+Word1Length.ToString());
+            System.Console.WriteLine();
             //Słowa 2
             foreach (char c in Word2)
-            {
-                System.Console.Write(c);
-            }
-            System.Console.WriteLine(" "+Word2Length.ToString());
-            System.Console.WriteLine();
-            //Tablica D
-            for (int j = 0; j<= Word2Length; j++)
-            {
-                for(int i = 0; i<= Word1Length; i++)
-                {
-                    System.Console.Write(D[i, j].ToString() + " ");
-                }
-                System.Console.WriteLine();
-            }
-            System.Console.WriteLine();
-            //Ścieżka D
-            foreach (char c in DPath)
-            {
-                System.Console.Write(c.ToString() + " ");
-            }
+                System.Console.Write(c + " ");
+            //System.Console.WriteLine(" "+Word2Length.ToString());
             System.Console.WriteLine();
             System.Console.WriteLine();
-            System.Console.WriteLine("Odległość edycyjna: " + D[Word1Length, Word2Length]);
-            System.Console.WriteLine();
+
+            ////Tablica D
+            //for (int j = 0; j<= Word2Length; j++)
+            //{
+            //    for(int i = 0; i<= Word1Length; i++)
+            //    {
+            //        System.Console.Write(D[i, j].ToString() + " ");
+            //    }
+            //    System.Console.WriteLine();
+            //}
+            //System.Console.WriteLine();
+
+            ////Ścieżka D
+            //foreach (char c in DPath)
+            //{
+            //    System.Console.Write(c.ToString() + " ");
+            //}
+            //System.Console.WriteLine();
+            //System.Console.WriteLine();
+            
             //Słowo 1 odległość edycyjna
-            foreach (char c in Word1D)
-            {
-                System.Console.Write(c.ToString() + " ");
-            }
+            System.Console.WriteLine("Odległość edycyjna: " + D[Word1Length, Word2Length]);
+            System.Console.WriteLine("Dopasowanie:");
             System.Console.WriteLine();
+            foreach (char c in Word1D)
+                System.Console.Write(c + " ");
+            System.Console.WriteLine();
+
             //Słowo 2 odległość edycyjna
             foreach (char c in Word2D)
-            {
-                System.Console.Write(c.ToString() + " ");
-            }
+                System.Console.Write(c + " ");
             System.Console.WriteLine();
-            System.Console.WriteLine();
-            //A
-            for (int j = 0; j <= Word2Length; j++)
-            {
-                for (int i = 0; i <= Word1Length; i++)
-                {
-                    System.Console.Write(A[i, j].ToString() + " ");
-                }
-                System.Console.WriteLine();
-            }
-            System.Console.WriteLine();
-            //B
-            for (int j = 0; j <= Word2Length; j++)
-            {
-                for (int i = 0; i <= Word1Length; i++)
-                {
-                    System.Console.Write(B[i, j].ToString() + " ");
-                }
-                System.Console.WriteLine();
-            }
-            System.Console.WriteLine();
-            //C
-            for (int j = 0; j <= Word2Length; j++)
-            {
-                for (int i = 0; i <= Word1Length; i++)
-                {
-                    System.Console.Write(C[i, j].ToString() + " ");
-                }
-                System.Console.WriteLine();
-            }
-            System.Console.WriteLine();
+
+            ////A
+            //for (int j = 0; j <= Word2Length; j++)
+            //{
+            //    for (int i = 0; i <= Word1Length; i++)
+            //    {
+            //        System.Console.Write(A[i, j].ToString() + " ");
+            //    }
+            //    System.Console.WriteLine();
+            //}
+            //System.Console.WriteLine();
+            ////B
+            //for (int j = 0; j <= Word2Length; j++)
+            //{
+            //    for (int i = 0; i <= Word1Length; i++)
+            //    {
+            //        System.Console.Write(B[i, j].ToString() + " ");
+            //    }
+            //    System.Console.WriteLine();
+            //}
+            //System.Console.WriteLine();
+            ////C
+            //for (int j = 0; j <= Word2Length; j++)
+            //{
+            //    for (int i = 0; i <= Word1Length; i++)
+            //    {
+            //        System.Console.Write(C[i, j].ToString() + " ");
+            //    }
+            //    System.Console.WriteLine();
+            //}
+            //System.Console.WriteLine();
             //S
             for (int j = 0; j <= Word2Length; j++)
             {
@@ -385,6 +383,7 @@ namespace BioCS
                 System.Console.WriteLine();
             }
             System.Console.WriteLine();
+
             //Ścieżka S
             foreach (char c in SPath)
             {
@@ -392,23 +391,25 @@ namespace BioCS
             }
             System.Console.WriteLine();
             System.Console.WriteLine();
-            System.Console.WriteLine("Podobienstwo wyrazow: " + S[Word1Length, Word2Length]);
             System.Console.WriteLine();
+
             //Słowo 1 podobienstwo
+            System.Console.WriteLine();
+            System.Console.WriteLine("Podobienstwo sekwencji (funkcja kary): " + S[Word1Length, Word2Length]);
+            Console.WriteLine("Optymalne dopasowanie (funkcja kary):");
             foreach (char c in Word1S)
-            {
                 System.Console.Write(c.ToString() + " ");
-            }
             System.Console.WriteLine();
             //Słowo 2 podobienstwo
             foreach (char c in Word2S)
-            {
                 System.Console.Write(c.ToString() + " ");
-            }
             System.Console.WriteLine();
             System.Console.WriteLine();
+            
+            //SequenceAlignment.Align(Word1, Word2);
+            HirshbergAlignment.Align(Word1, Word2);
 
-            System.Console.ReadKey();            
+            System.Console.ReadKey();
         }
     }
 }
