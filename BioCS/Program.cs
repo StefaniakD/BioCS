@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BioCS
 {
     class Program
     {
+        public const int MATCH = 2;
+        public const int MISMATCH = -1;
+        public const int PENALTY = -2;
+
         //Metryka
         public static int  CompareD(char w, char u)
         {
@@ -18,15 +19,15 @@ namespace BioCS
         //Podobienstwo
         public static int CompareS(char w, char u)
         {
-            if (w == u) return 2;
-            else return -1;
+            if (w == u) return MATCH;
+            else return MISMATCH;
         }
 
         //Funkcja Kary
         public static int Penalty(int x)
         {
             //return -(2 + x);
-            return -2;
+            return PENALTY;
         }
 
         static void Main(string[] args)
@@ -141,82 +142,82 @@ namespace BioCS
                     S[i, j] = valS;
                 }
             }
-            //Wyznaczenie optymalnego dopasowania D (najkrotsza droga)
-            DList = new List<char>();
-            iIndicator = Word1Length;
-            jIndicator = Word2Length;
-            DLength = 0;
+            ////Wyznaczenie optymalnego dopasowania D (najkrotsza droga)
+            //DList = new List<char>();
+            //iIndicator = Word1Length;
+            //jIndicator = Word2Length;
+            //DLength = 0;
 
-            while (iIndicator > 0 && jIndicator > 0)
-            {
-                int val = D[iIndicator, jIndicator];
-                if (D[iIndicator-1,jIndicator-1] < val)
-                {
-                    DList.Add('\\');
-                    DLength++;
-                    iIndicator--;
-                    jIndicator--;
-                }
-                else
-                {
-                    if (D[iIndicator - 1, jIndicator] < val)
-                    {
-                        DList.Add('-');
-                        DLength++;
-                        iIndicator--;
-                    }
-                    else
-                    {
-                        if (D[iIndicator, jIndicator - 1] < val)
-                        {
-                            DList.Add('|');
-                            DLength++;
-                            jIndicator--;
-                        }
-                        else
-                        {
-                            DList.Add('\\');
-                            DLength++;
-                            iIndicator--;
-                            jIndicator--;
-                        }
-                    }
-                }
-            }
+            //while (iIndicator > 0 && jIndicator > 0)
+            //{
+            //    int val = D[iIndicator, jIndicator];
+            //    if (D[iIndicator-1,jIndicator-1] < val)
+            //    {
+            //        DList.Add('\\');
+            //        DLength++;
+            //        iIndicator--;
+            //        jIndicator--;
+            //    }
+            //    else
+            //    {
+            //        if (D[iIndicator - 1, jIndicator] < val)
+            //        {
+            //            DList.Add('-');
+            //            DLength++;
+            //            iIndicator--;
+            //        }
+            //        else
+            //        {
+            //            if (D[iIndicator, jIndicator - 1] < val)
+            //            {
+            //                DList.Add('|');
+            //                DLength++;
+            //                jIndicator--;
+            //            }
+            //            else
+            //            {
+            //                DList.Add('\\');
+            //                DLength++;
+            //                iIndicator--;
+            //                jIndicator--;
+            //            }
+            //        }
+            //    }
+            //}
             
-            //Stworzenie wektora przejść D i słów Word1i2D
-            DPath = new char[DLength];
-            Word1D = new char[DLength];
-            Word2D = new char[DLength];
-            iIndicator = Word1Length;
-            jIndicator = Word2Length;
+            ////Stworzenie wektora przejść D i słów Word1i2D
+            //DPath = new char[DLength];
+            //Word1D = new char[DLength];
+            //Word2D = new char[DLength];
+            //iIndicator = Word1Length;
+            //jIndicator = Word2Length;
 
-            for (int i= 0; i < DLength; i++)
-            {
-                DPath[DLength-1 - i] = DList[i];
+            //for (int i= 0; i < DLength; i++)
+            //{
+            //    DPath[DLength-1 - i] = DList[i];
 
-                switch (DList[i])
-                {
-                    case '\\':
-                        Word1D[DLength - 1 - i] = Word1[iIndicator-1];
-                        Word2D[DLength - 1 - i] = Word2[jIndicator-1];
-                        iIndicator--;
-                        jIndicator--;
-                        break;
+            //    switch (DList[i])
+            //    {
+            //        case '\\':
+            //            Word1D[DLength - 1 - i] = Word1[iIndicator-1];
+            //            Word2D[DLength - 1 - i] = Word2[jIndicator-1];
+            //            iIndicator--;
+            //            jIndicator--;
+            //            break;
 
-                    case '-':
-                        Word1D[DLength - 1 - i] = Word1[iIndicator-1];
-                        Word2D[DLength - 1 - i] = '-';
-                        iIndicator--;
-                        break;
+            //        case '-':
+            //            Word1D[DLength - 1 - i] = Word1[iIndicator-1];
+            //            Word2D[DLength - 1 - i] = '-';
+            //            iIndicator--;
+            //            break;
 
-                    case '|':
-                        Word1D[DLength - 1 - i] = '-';
-                        Word2D[DLength - 1 - i] = Word2[jIndicator-1];
-                        jIndicator--;
-                        break;
-                }
-            }
+            //        case '|':
+            //            Word1D[DLength - 1 - i] = '-';
+            //            Word2D[DLength - 1 - i] = Word2[jIndicator-1];
+            //            jIndicator--;
+            //            break;
+            //    }
+            //}
 
             //Wyznaczenie optymalnego podobienstwa S (najdluzsza droga)
             SList = new List<char>();
@@ -330,18 +331,18 @@ namespace BioCS
             //System.Console.WriteLine();
             //System.Console.WriteLine();
             
-            //Słowo 1 odległość edycyjna
-            System.Console.WriteLine("Odległość edycyjna: " + D[Word1Length, Word2Length]);
-            System.Console.WriteLine("Dopasowanie:");
-            System.Console.WriteLine();
-            foreach (char c in Word1D)
-                System.Console.Write(c + " ");
-            System.Console.WriteLine();
+            ////Słowo 1 odległość edycyjna
+            //System.Console.WriteLine("Odległość edycyjna: " + D[Word1Length, Word2Length]);
+            //System.Console.WriteLine("Dopasowanie:");
+            //System.Console.WriteLine();
+            //foreach (char c in Word1D)
+            //    System.Console.Write(c + " ");
+            //System.Console.WriteLine();
 
-            //Słowo 2 odległość edycyjna
-            foreach (char c in Word2D)
-                System.Console.Write(c + " ");
-            System.Console.WriteLine();
+            ////Słowo 2 odległość edycyjna
+            //foreach (char c in Word2D)
+            //    System.Console.Write(c + " ");
+            //System.Console.WriteLine();
 
             ////A
             //for (int j = 0; j <= Word2Length; j++)
@@ -373,25 +374,25 @@ namespace BioCS
             //    System.Console.WriteLine();
             //}
             //System.Console.WriteLine();
-            //S
-            for (int j = 0; j <= Word2Length; j++)
-            {
-                for (int i = 0; i <= Word1Length; i++)
-                {
-                    System.Console.Write(S[i, j].ToString() + " ");
-                }
-                System.Console.WriteLine();
-            }
-            System.Console.WriteLine();
+            ////S
+            //for (int j = 0; j <= Word2Length; j++)
+            //{
+            //    for (int i = 0; i <= Word1Length; i++)
+            //    {
+            //        System.Console.Write(S[i, j].ToString() + " ");
+            //    }
+            //    System.Console.WriteLine();
+            //}
+            //System.Console.WriteLine();
 
-            //Ścieżka S
-            foreach (char c in SPath)
-            {
-                System.Console.Write(c.ToString() + " ");
-            }
-            System.Console.WriteLine();
-            System.Console.WriteLine();
-            System.Console.WriteLine();
+            ////Ścieżka S
+            //foreach (char c in SPath)
+            //{
+            //    System.Console.Write(c.ToString() + " ");
+            //}
+            //System.Console.WriteLine();
+            //System.Console.WriteLine();
+            //System.Console.WriteLine();
 
             //Słowo 1 podobienstwo
             System.Console.WriteLine();
@@ -405,8 +406,7 @@ namespace BioCS
                 System.Console.Write(c.ToString() + " ");
             System.Console.WriteLine();
             System.Console.WriteLine();
-            
-            //SequenceAlignment.Align(Word1, Word2);
+            //Algorytm Hirshberga
             HirshbergAlignment.Align(Word1, Word2);
 
             System.Console.ReadKey();

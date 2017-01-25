@@ -1,47 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BioCS
 {
     class HirshbergAlignment
     {
+        //Zmienne przechowujące wynik dopasowania
         public static char[] Word1Result;
         public static char[] Word2Result;
 
-        public const int Match = 2;
-        public const int Mismath = -1;
-        public const int Gap = -2;
+        //Wartości dopasowania/niedopasowania
+        public const int Match = Program.MATCH;
+        public const int Mismatch = Program.MISMATCH;
+        public const int Gap = Program.PENALTY;
+        //public const int Match = 2;
+        //public const int Mismatch = -1;
+        //public const int Gap = -2;
 
+        //Porównanie dwóch znaków
         public static int Compare(char a, char b)
         {
-            return (a == b) ? Match : Mismath;
+            return (a == b) ? Match : Mismatch;
             //if (a == b) return Match;
-            //else return Mismath;
+            //else return Mismatch;
         }
 
         //Tworzy Macierz S, wykorzystując jedynie dwa rzędy pamięci na raz
-        //Zwraca koordynaty i wartość maksymalnej wartości.
-        private static void SmithWaterman(char[] u, char[] w, out int max_i, out int max_j, out int max_value)
+        //Zwraca wartość maksymalna.
+        private static int MaxScore(char[] u, char[] w)
         {
             int uLength = u.Length;
             int wLength = w.Length;
 
             int[] h0 = new int[uLength + 1];
             int[] h1 = new int[uLength + 1];
-
-            max_value = 0;
-            max_i = 0;
-            max_j = 0;
+            
 
             for(int j = 1; j < wLength + 1; j++)
             {
                 for (int i = 1; i < uLength + 1; i++)
                 {
                     int max = 0;
-                    int a = h0[i - 1] + ((u[i - 1] == w[j - 1]) ? Match : Mismath);
+                    int a = h0[i - 1] + ((u[i - 1] == w[j - 1]) ? Match : Mismatch);
                     if (a > max) max = a;
                     a = h1[i - 1] + Gap;
                     if (a > max) max = a;
@@ -49,38 +49,15 @@ namespace BioCS
                     if (a > max) max = a;
 
                     h1[i] = max;
-
-                    if (h1[i] > max_value)
-                    {
-                        max_value = h1[i];
-                        max_i = i - 1;
-                        max_j = j - 1;
-                    }
+                    
                 }
                 h0 = h1;
                 h1 = new int[uLength + 1];
             }
-        }
-        
-        private static void LocalToGlobal(char[] u, char[] w, out char[] uLocal, out char[] wLocal, out int maxScore)
-        {
-            int border0, border1;
-            SmithWaterman(u, w, out border0, out border1, out maxScore);
-            char[] uu = new char[border0 + 1];
-            Array.Copy(u, uu, border0 + 1);
-            Array.Reverse(uu);
-            char[] ww = new char[border1 + 1];
-            Array.Copy(w, ww, border1 + 1);
-            Array.Reverse(ww);
-            SmithWaterman(uu, ww, out border0, out border1, out maxScore);
-            uLocal = new char[border0 + 1];
-            Array.Copy(uu, uLocal, border0 + 1);
-            Array.Reverse(uLocal);
-            wLocal = new char[border1 + 1];
-            Array.Copy(ww, wLocal, border1 + 1);
-            Array.Reverse(wLocal);
+            return h0[uLength];
         }
 
+        //Oblicza dopasowania dla najprostszych przypadków algoytmu Hirschberga
         private static void NeedlemanWunch(char[] u, char[] w, out char[] Word2Result, out char[] Word1Result)
         {
             int i, j;
@@ -92,7 +69,7 @@ namespace BioCS
             for (i = 1; i < u.Length + 1; i++)
                 for (j = 1; j < w.Length + 1; j++)
                 {
-                    int max = f[i - 1, j - 1] + ((u[i - 1] == w[j - 1]) ? Match : Mismath);
+                    int max = f[i - 1, j - 1] + ((u[i - 1] == w[j - 1]) ? Match : Mismatch);
                     int a = f[i - 1, j] + Gap;
                     if (a > max) max = a;
                     a = f[i, j - 1] + Gap;
@@ -110,7 +87,7 @@ namespace BioCS
             while (i > 0 || j > 0)
             {
                 if (i > 0 && j > 0 && f[i, j] ==
-                    (f[i - 1, j - 1] + ((u[i - 1] == w[j - 1]) ? Match : Mismath)))
+                    (f[i - 1, j - 1] + ((u[i - 1] == w[j - 1]) ? Match : Mismatch)))
                 {
                     alu.Append(u[i - 1]);
                     alw.Append(w[j - 1]);
@@ -136,6 +113,7 @@ namespace BioCS
             Array.Reverse(Word2Result);
         }
 
+        //Zwraca ostatni wiersz tabeli Needlman-Wunsch'a
         private static int[] NWScore(char[] u, char[] w)
         {
             int[] score0 = new int[w.Length + 1];
@@ -148,7 +126,7 @@ namespace BioCS
                 score1[0] = score0[0] + Gap;
                 for (int j = 1; j < w.Length + 1; j++)
                 {
-                    score1[j] = Math.Max(score0[j - 1] + ((u[i - 1] == w[j - 1]) ? Match : Mismath),
+                    score1[j] = Math.Max(score0[j - 1] + ((u[i - 1] == w[j - 1]) ? Match : Mismatch),
                         Math.Max(score1[j - 1] + Gap, score0[j] + Gap)); ;
 
                 }
@@ -158,6 +136,7 @@ namespace BioCS
             return score0;
         }
 
+        //Oblicza podwektor na podstawie wektora
         private static char[] SubCharArray(char[] x,int start, int end, bool shouldReverse)
         {
             char[] result = new char[end - start];
@@ -167,6 +146,7 @@ namespace BioCS
             return result;
         }
 
+        //Oblicza 
         private static int PartitionY(int[] sl, int[] sr)
         {
             int max_value = int.MinValue;
@@ -239,14 +219,9 @@ namespace BioCS
         }
         public static void Align(char[] u, char[] w)
         {
-            char[] uLocal;
-            char[] wLocal;
-            int maxScore;
-            LocalToGlobal(u, w, out uLocal, out wLocal, out maxScore);
+            Hirshberg(u, w, out Word1Result, out Word2Result);
 
-            Hirshberg(uLocal, wLocal, out Word1Result, out Word2Result);
-
-            Console.WriteLine("Podobienstwo sekwencji (Hirshberg): " + maxScore);
+            Console.WriteLine("Podobienstwo sekwencji (Hirshberg): " + MaxScore(u, w));
             Console.WriteLine("Optymalne dopasowanie (Hirshberg):");
             Console.WriteLine();
             foreach (char c in Word2Result)
